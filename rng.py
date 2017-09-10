@@ -1,5 +1,6 @@
 from functools import reduce
-from math import pi, fabs, sqrt
+from itertools import repeat
+from math import pi, fabs, sqrt, isclose
 from statistics import mean
 
 from helper import min_max
@@ -14,16 +15,11 @@ def _calculate_next(prev, mod, mul):
 
 def lehmer_random(seed, mod, mul, size=None):
     assert size is None or size > 0
-    if size is None:
-        while True:
-            next_seed = _calculate_next(seed, mod, mul)
-            seed = next_seed
-            yield next_seed / mod
-    else:
-        for _ in range(size):
-            next_seed = _calculate_next(seed, mod, mul)
-            seed = next_seed
-            yield next_seed / mod
+    random_range = repeat(0) if size is None else range(size)
+    for _ in random_range:
+        next_seed = _calculate_next(seed, mod, mul)
+        seed = next_seed
+        yield next_seed / mod
 
 
 def indirect_signs_checking(random_values):
@@ -43,6 +39,7 @@ def numerical_characteristics_estimation(random_values):
 
 
 def count_interval_distribution(random_values, interval_count=20):
+    # FIXME: invalid last interval distribution
     _min, _max = min_max(random_values)
     interval = float(_max - _min) / (interval_count - 1)
     interval_distribution = {k: 0 for k in range(interval_count)}
@@ -54,3 +51,22 @@ def count_interval_distribution(random_values, interval_count=20):
 
     interval_distribution = {k: normalize(v) for k, v in interval_distribution.items()}
     return interval_distribution
+
+
+def aperiodic_interval_and_period(random_values):
+    test_value = random_values[-1]
+    first_occurrence_index = -1
+    period = 0
+    for i, value in enumerate(random_values, start=0):
+        if isclose(value, test_value):
+            if first_occurrence_index == -1:
+                first_occurrence_index = i
+            else:
+                period = i - first_occurrence_index
+                break
+    aperiodic_interval = -1
+    for i in range(len(random_values)):
+        if isclose(random_values[i], random_values[i + period]):
+            aperiodic_interval = i + period
+            break
+    return aperiodic_interval, period

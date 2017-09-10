@@ -8,8 +8,8 @@ def log_info(msg):
 
 
 def min_max(iterable):
-    _min = iterable[0]
-    _max = iterable[0]
+    _min = float("Inf")
+    _max = -float("Inf")
     for value in iterable:
         if value < _min:
             _min = value
