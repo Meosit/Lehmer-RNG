@@ -39,9 +39,9 @@ def numerical_characteristics_estimation(random_values):
 
 
 def count_interval_distribution(random_values, interval_count=20):
-    # FIXME: invalid last interval distribution
     _min, _max = min_max(random_values)
-    interval = float(_max - _min) / (interval_count - 1)
+    interval = float(_max - _min) / interval_count
+    interval += 0.00000001  # fix for correct floating-point division
     interval_distribution = {k: 0 for k in range(interval_count)}
     for value in random_values:
         interval_index = int((value - _min) / interval)
