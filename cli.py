@@ -24,10 +24,14 @@ def parse_args():
                         dest="mod",
                         metavar="<mod>", required=True)
 
-    parser.add_argument("-n", "--numbers-count", type=_check_positive_int,
+    parser.add_argument("-n", "--numbers", type=_check_positive_int,
                         help="generate such number of random values",
                         dest="numbers_count",
                         metavar="<count>", default=1_000_000)
+    parser.add_argument("-i", "--intervals", type=_check_positive_int,
+                        help="check interval distribution for such number of intervals",
+                        dest="intervals_count",
+                        metavar="<count>", default=20)
 
     parsed = parser.parse_args()
 
