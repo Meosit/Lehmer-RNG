@@ -33,10 +33,41 @@ def parse_args():
                         dest="intervals_count",
                         metavar="<count>", default=20)
 
+    subparsers = parser.add_subparsers(title="modes",
+                                       description="valid generator modes",
+                                       dest="mode")
+    subparsers.required = True
+    subparsers.add_parser("raw", help="plain Lehmer generator without any changes")
+    even_parser = subparsers.add_parser("even", help="even distribution imitation")
+    even_parser.add_argument("-l", "--lower-bound", type=float,
+                             help="lower bound of the random value",
+                             dest="even_lower_bound", metavar="<bound>",
+                             required=True, default=0.0)
+    even_parser.add_argument("-u", "--upper-bound", type=float,
+                             help="upper bound of the random value",
+                             dest="even_upper_bound", metavar="<bound>",
+                             required=True, default=1.0)
+
+    gaussian_parser = subparsers.add_parser("gaussian", help="gaussian distribution imitation")
+
+    exponential_parser = subparsers.add_parser("exponential", help="exponential distribution imitation")
+
+    gamma_parser = subparsers.add_parser("gamma", help="gamma distribution imitation")
+
+    triangle_parser = subparsers.add_parser("triangle", help="triangle distribution imitation")
+
+    simpsons_parser = subparsers.add_parser("simpsons", help="simpsons distribution imitation")
+
     parsed = parser.parse_args()
 
     if parsed.mod < parsed.mul:
         raise ArgumentError(argument="-m, --module",
                             message="module must be greater than multiplier (-a, --multiplier option)")
+
+    if parsed.even_upper_bound is not None and \
+                    parsed.even_lower_bound is not None and \
+                    parsed.even_upper_bound < parsed.even_lower_bound:
+        raise ArgumentError(argument="-u, --upper-bound",
+                            message="upper bound must be greater than lower bound")
 
     return parsed
