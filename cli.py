@@ -8,6 +8,13 @@ def _check_positive_int(value):
     return val
 
 
+def _check_positive_float(value):
+    val = float(value)
+    if val <= 0:
+        raise ArgumentTypeError(f"{value} is an invalid positive float value")
+    return val
+
+
 def parse_args():
     parser = ArgumentParser(description="Lehmer RNG (Laboratory works #1 and #2)")
 
@@ -38,25 +45,70 @@ def parse_args():
                                        dest="mode")
     subparsers.required = True
     subparsers.add_parser("raw", help="plain Lehmer generator without any changes")
+
     even_parser = subparsers.add_parser("even", help="even distribution imitation")
     even_parser.add_argument("-l", "--lower-bound", type=float,
-                             help="lower bound of the random value",
-                             dest="even_lower_bound", metavar="<bound>",
+                             help="lower bound of even distribution",
+                             dest="lower_bound", metavar="<bound>",
                              required=True, default=0.0)
     even_parser.add_argument("-u", "--upper-bound", type=float,
-                             help="upper bound of the random value",
-                             dest="even_upper_bound", metavar="<bound>",
+                             help="upper bound of even distribution",
+                             dest="upper_bound", metavar="<bound>",
                              required=True, default=1.0)
 
     gaussian_parser = subparsers.add_parser("gaussian", help="gaussian distribution imitation")
+    gaussian_parser.add_argument("-m", "--lower-bound", type=float,
+                                 help="mean of gaussian distribution",
+                                 dest="mean", metavar="<value>",
+                                 required=True, default=0.0)
+    gaussian_parser.add_argument("-D", "--deviation", type=float,
+                                 help="standard deviation of gaussian distribution",
+                                 dest="deviation", metavar="<value>",
+                                 required=True)
+    gaussian_parser.add_argument("-N", "--base-numbers", type=_check_positive_int,
+                                 help="number of p.p randoms as base for every number of gaussian distribution",
+                                 dest="base_numbers", metavar="<value>",
+                                 required=True, default=12)
 
     exponential_parser = subparsers.add_parser("exponential", help="exponential distribution imitation")
+    exponential_parser.add_argument("-L", "--lambda", type=_check_positive_float,
+                                    help="rate parameter of exponential distribution",
+                                    dest="lambda", metavar="<value>",
+                                    required=True)
 
     gamma_parser = subparsers.add_parser("gamma", help="gamma distribution imitation")
+    gamma_parser.add_argument("-L", "--lambda", type=_check_positive_float,
+                              help="parameter of gaussian distribution",
+                              dest="lambda", metavar="<value>",
+                              required=True)
+    gamma_parser.add_argument("-e", "--eta", type=_check_positive_int,
+                              help="Erlang distribution parameter",
+                              dest="eta", metavar="<value>",
+                              required=True)
 
     triangle_parser = subparsers.add_parser("triangle", help="triangle distribution imitation")
+    triangle_parser.add_argument("-l", "--lower-bound", type=float,
+                                 help="lower bound of triangle distribution",
+                                 dest="lower_bound", metavar="<bound>",
+                                 required=True, default=0.0)
+    triangle_parser.add_argument("-u", "--upper-bound", type=float,
+                                 help="upper bound of triangle distribution",
+                                 dest="upper_bound", metavar="<bound>",
+                                 required=True, default=1.0)
+    triangle_parser.add_argument("-t", "--type",
+                                 help="formula type of triangle distribution",
+                                 dest="type", metavar="<type>",
+                                 required=True, choices=['min', 'max'])
 
-    simpsons_parser = subparsers.add_parser("simpsons", help="simpsons distribution imitation")
+    simpson_parser = subparsers.add_parser("simpson", help="simpsons distribution imitation")
+    simpson_parser.add_argument("-l", "--lower-bound", type=float,
+                                help="lower bound of simpson distribution",
+                                dest="lower_bound", metavar="<bound>",
+                                required=True, default=0.0)
+    simpson_parser.add_argument("-u", "--upper-bound", type=float,
+                                help="upper bound of simpson distribution",
+                                dest="upper_bound", metavar="<bound>",
+                                required=True, default=1.0)
 
     parsed = parser.parse_args()
 
@@ -64,8 +116,8 @@ def parse_args():
         raise ArgumentError(argument="-m, --module",
                             message="module must be greater than multiplier (-a, --multiplier option)")
 
-    if parsed.even_upper_bound is not None and \
-                    parsed.even_lower_bound is not None and \
+    if hasattr(parsed, 'upper_bound') and \
+            hasattr(parsed, 'lower_bound') and \
                     parsed.even_upper_bound < parsed.even_lower_bound:
         raise ArgumentError(argument="-u, --upper-bound",
                             message="upper bound must be greater than lower bound")

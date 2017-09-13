@@ -13,7 +13,7 @@ def show_results(interval_distribution, checking_report, numerical_characteristi
     report_str = "{0:.10f} - Theoretical probability\n{1:.10f} - Actual probability\n{2:.10f} - Delta" \
         .format(*checking_report)
 
-    num_chars_str = "{0:.10f} - Mathematical expectation\n{1:.10f} - Dispersion\n{2:.10f} - Mean squared deviation" \
+    num_chars_str = "{0:.10f} - Mean\n{1:.10f} - Variance\n{2:.10f} - Standard deviation" \
         .format(*numerical_characteristics)
 
     periodic_stats_str = "Aperiodic interval: {0:d}, Period: {1:d}".format(*periodic_stats)
