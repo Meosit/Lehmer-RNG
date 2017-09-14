@@ -1,9 +1,9 @@
 from functools import reduce
 from itertools import repeat
-from math import pi, fabs, sqrt, isclose
+from math import pi, fabs, sqrt, isclose, log
 from statistics import mean
 
-from helper import min_max
+from helper import min_max, finite
 
 THEORETICAL_PROBABILITY = pi / 4
 
@@ -13,13 +13,81 @@ def _calculate_next(prev, mod, mul):
     return next_seed
 
 
-def lehmer_random(seed, mod, mul, size=None):
-    assert size is None or size > 0
+def _extract_basic_parameters(param_dict):
+    return param_dict['seed'], param_dict['mod'], param_dict['mul'], param_dict['numbers_count'],
+
+
+def lehmer_random(params):
+    seed, mod, mul, size = _extract_basic_parameters(params)
     random_range = repeat(0) if size is None else range(size)
     for _ in random_range:
         next_seed = _calculate_next(seed, mod, mul)
         seed = next_seed
         yield next_seed / mod
+
+
+def uniform_random(params):
+    lower_bound, upper_bound, size = params['lower_bound'], params['upper_bound'], params['numbers_count']
+    rng = lehmer_random(params)
+    random_range = repeat(0) if size is None else range(size)
+    for _ in random_range:
+        next_seed = next(rng)
+        yield lower_bound + ((upper_bound - lower_bound) * next_seed)
+
+
+def gaussian_random(params):
+    _mean, deviation, base_numbers, size = params['mean'], params['deviation'], \
+                                           params['base_numbers'], params['numbers_count']
+    random_range = repeat(0) if size is None else range(size)
+    params['numbers_count'] = None
+    rng = lehmer_random(params)
+    coefficient = deviation * sqrt(12.0 / base_numbers)
+    subtrahend = (base_numbers / 2)
+    for _ in random_range:
+        rng_sum = sum(finite(rng, base_numbers))
+        yield _mean + coefficient * (rng_sum - subtrahend)
+
+
+def exponential_random(params):
+    _lambda, size = params['lambda'], params['numbers_count']
+    random_range = repeat(0) if size is None else range(size)
+    params['numbers_count'] = None
+    rng = lehmer_random(params)
+    coefficient = (-1 / _lambda)
+    for _ in random_range:
+        yield coefficient * log(next(rng))
+
+
+def gamma_random(params):
+    _lambda, eta, size = params['lambda'], params['eta'], params['numbers_count']
+    random_range = repeat(0) if size is None else range(size)
+    params['numbers_count'] = None
+    rng = lehmer_random(params)
+    coefficient = (-1 / _lambda)
+    for _ in random_range:
+        _sum = sum(map(log, finite(rng, eta)))
+        yield coefficient * _sum
+
+
+def triangle_random(params):
+    lower_bound, upper_bound, size = params['lower_bound'], params['upper_bound'], params['numbers_count']
+    func = min if params['type'] == 'min' else max
+    random_range = repeat(0) if size is None else range(size)
+    params['numbers_count'] = None
+    rng = lehmer_random(params)
+    for _ in random_range:
+        yield lower_bound + ((upper_bound - lower_bound) * func(next(rng), next(rng)))
+
+
+def simpson_random(params):
+    size = params['numbers_count']
+    random_range = repeat(0) if size is None else range(size)
+    params['numbers_count'] = None
+    params['lower_bound'] = params['lower_bound'] / 2.0
+    params['upper_bound'] = params['upper_bound'] / 2.0
+    rng = uniform_random(params)
+    for _ in random_range:
+        yield next(rng) + next(rng)
 
 
 def indirect_signs_checking(random_values):

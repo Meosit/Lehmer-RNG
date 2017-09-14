@@ -10,9 +10,6 @@ def _draw_labels(rects, ax):
 
 
 def show_results(interval_distribution, checking_report, numerical_characteristics, periodic_stats):
-    report_str = "{0:.10f} - Theoretical probability\n{1:.10f} - Actual probability\n{2:.10f} - Delta" \
-        .format(*checking_report)
-
     num_chars_str = "{0:.10f} - Mean\n{1:.10f} - Variance\n{2:.10f} - Standard deviation" \
         .format(*numerical_characteristics)
 
@@ -24,7 +21,12 @@ def show_results(interval_distribution, checking_report, numerical_characteristi
 
     fig.gca().set_position((.1, .25, .8, .75))
     fig.canvas.set_window_title('Lehmer RNG')
-    fig.text(.02, .02, report_str)
+
+    if checking_report is not None:
+        report_str = "{0:.10f} - Theoretical probability\n{1:.10f} - Actual probability\n{2:.10f} - Delta" \
+            .format(*checking_report)
+        fig.text(.02, .02, report_str)
+
     fig.text(.52, .02, num_chars_str)
     fig.text(.25, .14, periodic_stats_str)
     plt.xticks(range(len(interval_distribution)), interval_distribution.keys())

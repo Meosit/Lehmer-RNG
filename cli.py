@@ -46,21 +46,21 @@ def parse_args():
     subparsers.required = True
     subparsers.add_parser("raw", help="plain Lehmer generator without any changes")
 
-    even_parser = subparsers.add_parser("even", help="even distribution imitation")
-    even_parser.add_argument("-l", "--lower-bound", type=float,
-                             help="lower bound of even distribution",
-                             dest="lower_bound", metavar="<bound>",
-                             required=True, default=0.0)
-    even_parser.add_argument("-u", "--upper-bound", type=float,
-                             help="upper bound of even distribution",
-                             dest="upper_bound", metavar="<bound>",
-                             required=True, default=1.0)
+    uniform_parser = subparsers.add_parser("uniform", help="uniform distribution imitation")
+    uniform_parser.add_argument("-l", "--lower-bound", type=float,
+                                help="lower bound of uniform distribution",
+                                dest="lower_bound", metavar="<bound>",
+                                default=0.0)
+    uniform_parser.add_argument("-u", "--upper-bound", type=float,
+                                help="upper bound of uniform distribution",
+                                dest="upper_bound", metavar="<bound>",
+                                default=1.0)
 
     gaussian_parser = subparsers.add_parser("gaussian", help="gaussian distribution imitation")
-    gaussian_parser.add_argument("-m", "--lower-bound", type=float,
+    gaussian_parser.add_argument("-M", "--mean", type=float,
                                  help="mean of gaussian distribution",
                                  dest="mean", metavar="<value>",
-                                 required=True, default=0.0)
+                                 required=True)
     gaussian_parser.add_argument("-D", "--deviation", type=float,
                                  help="standard deviation of gaussian distribution",
                                  dest="deviation", metavar="<value>",
@@ -68,7 +68,7 @@ def parse_args():
     gaussian_parser.add_argument("-N", "--base-numbers", type=_check_positive_int,
                                  help="number of p.p randoms as base for every number of gaussian distribution",
                                  dest="base_numbers", metavar="<value>",
-                                 required=True, default=12)
+                                 default=12)
 
     exponential_parser = subparsers.add_parser("exponential", help="exponential distribution imitation")
     exponential_parser.add_argument("-L", "--lambda", type=_check_positive_float,
@@ -90,25 +90,25 @@ def parse_args():
     triangle_parser.add_argument("-l", "--lower-bound", type=float,
                                  help="lower bound of triangle distribution",
                                  dest="lower_bound", metavar="<bound>",
-                                 required=True, default=0.0)
+                                 default=0.0)
     triangle_parser.add_argument("-u", "--upper-bound", type=float,
                                  help="upper bound of triangle distribution",
                                  dest="upper_bound", metavar="<bound>",
-                                 required=True, default=1.0)
+                                 default=1.0)
     triangle_parser.add_argument("-t", "--type",
                                  help="formula type of triangle distribution",
                                  dest="type", metavar="<type>",
-                                 required=True, choices=['min', 'max'])
+                                 choices=['min', 'max'], default='min')
 
     simpson_parser = subparsers.add_parser("simpson", help="simpsons distribution imitation")
     simpson_parser.add_argument("-l", "--lower-bound", type=float,
                                 help="lower bound of simpson distribution",
                                 dest="lower_bound", metavar="<bound>",
-                                required=True, default=0.0)
+                                default=0.0)
     simpson_parser.add_argument("-u", "--upper-bound", type=float,
                                 help="upper bound of simpson distribution",
                                 dest="upper_bound", metavar="<bound>",
-                                required=True, default=1.0)
+                                default=1.0)
 
     parsed = parser.parse_args()
 
@@ -118,7 +118,7 @@ def parse_args():
 
     if hasattr(parsed, 'upper_bound') and \
             hasattr(parsed, 'lower_bound') and \
-                    parsed.even_upper_bound < parsed.even_lower_bound:
+                    parsed.upper_bound < parsed.lower_bound:
         raise ArgumentError(argument="-u, --upper-bound",
                             message="upper bound must be greater than lower bound")
 

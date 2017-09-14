@@ -7,6 +7,11 @@ def log_info(msg):
     print(f"INFO: {msg}")
 
 
+def finite(iterable, times):
+    for _ in range(times):
+        yield next(iterable)
+
+
 def min_max(iterable):
     _min = float("Inf")
     _max = -float("Inf")
