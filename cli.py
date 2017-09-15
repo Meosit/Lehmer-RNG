@@ -110,16 +110,16 @@ def parse_args():
                                 dest="upper_bound", metavar="<bound>",
                                 default=1.0)
 
-    parsed = parser.parse_args()
+    options = parser.parse_args()
 
-    if parsed.mod < parsed.mul:
+    if options.mod < options.mul:
         raise ArgumentError(argument="-m, --module",
                             message="module must be greater than multiplier (-a, --multiplier option)")
 
-    if hasattr(parsed, 'upper_bound') and \
-            hasattr(parsed, 'lower_bound') and \
-                    parsed.upper_bound < parsed.lower_bound:
+    if hasattr(options, 'upper_bound') and \
+            hasattr(options, 'lower_bound') and \
+                    options.upper_bound < options.lower_bound:
         raise ArgumentError(argument="-u, --upper-bound",
                             message="upper bound must be greater than lower bound")
 
-    return parsed
+    return options

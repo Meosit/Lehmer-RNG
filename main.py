@@ -13,13 +13,13 @@ RNG_GENERATORS = {
 }
 
 if __name__ == '__main__':
-    parsed = parse_args()
-    rng = RNG_GENERATORS[parsed.mode](vars(parsed))
+    options = parse_args()
+    rng = RNG_GENERATORS[options.mode](vars(options))
     random_values = list(rng)
 
-    checking_report = indirect_signs_checking(random_values) if parsed.mode == 'raw' else None
+    checking_report = indirect_signs_checking(random_values) if options.mode == 'raw' else None
     numerical_characteristics = numerical_characteristics_estimation(random_values)
-    interval_distribution = count_interval_distribution(random_values, parsed.intervals_count)
+    interval_distribution = count_interval_distribution(random_values, options.intervals_count)
     periodic_stats = aperiodic_interval_and_period(random_values)
 
     show_results(interval_distribution, checking_report, numerical_characteristics, periodic_stats)
